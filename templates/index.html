@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Let Naija Speak — AI Review Generator</title>
+<style>
+/* ═══════════════════════════════════════════════
+   FONTS
+═══════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Inter',sans-serif;
+  background:#0d0d0d;
+  color:#f0f0f0;
+  min-height:100vh;
+}
+
+/* ═══════════════════════════════════════════════
+   HEADER — Nigerian flag colours
+═══════════════════════════════════════════════ */
+.header{
+  background:linear-gradient(135deg,#006400 0%,#008751 50%,#006400 100%);
+  padding:2.5rem 2rem;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  border-bottom:4px solid #f5a623;
+}
+.header::before{
+  content:'';
+  position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.header-content{position:relative;z-index:1}
+.flag-stripe{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-bottom:1rem;
+}
+.stripe{
+  width:40px;height:6px;border-radius:3px;
+}
+.stripe.green{background:#008751}
+.stripe.white{background:#ffffff}
+.header h1{
+  font-size:clamp(1.8rem,4vw,3rem);
+  font-weight:900;
+  color:#fff;
+  text-shadow:2px 2px 12px rgba(0,0,0,0.5);
+  margin-bottom:0.5rem;
+  letter-spacing:-0.5px;
+}
+.header-sub{
+  color:rgba(255,255,255,0.85);
+  font-size:clamp(0.85rem,2vw,1.05rem);
+  margin-bottom:0.8rem;
+  line-height:1.6;
+}
+.badges{
+  display:flex;
+  justify-content:center;
+  gap:0.6rem;
+  flex-wrap:wrap;
+}
+.badge{
+  display:inline-block;
+  padding:0.35rem 0.9rem;
+  border-radius:20px;
+  font-weight:700;
+  font-size:0.78rem;
+  letter-spacing:0.3px;
+}
+.badge-gold{background:#f5a623;color:#000}
+.badge-white{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3)}
+
+/* ═══════════════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════════════ */
+.container{
+  max-width:1400px;
+  margin:0 auto;
+  padding:2rem 1.5rem;
+}
+.main-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  margin-top:1.5rem;
+}
+@media(max-width:960px){
+  .main-grid{grid-template-columns:1fr}
+}
+
+/* ═══════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════ */
+.card{
+  background:#141414;
+  border:1px solid #222;
+  border-radius:16px;
+  padding:1.5rem;
+  margin-bottom:1.2rem;
+}
+.card:last-child{margin-bottom:0}
+.card-header{
+  font-size:0.95rem;
+  font-weight:700;
+  color:#f5a623;
+  margin-bottom:1.2rem;
+  padding-bottom:0.8rem;
+  border-bottom:1px solid #222;
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+}
+
+/* ═══════════════════════════════════════════════
+   FORM ELEMENTS
+═══════════════════════════════════════════════ */
+.form-row{margin-bottom:1rem}
+.form-label{
+  display:block;
+  font-size:0.78rem;
+  font-weight:600;
+  color:#888;
+  margin-bottom:0.35rem;
+  text-transform:uppercase;
+  letter-spacing:0.4px;
+}
+.form-input,
+.form-select,
+.form-textarea{
+  width:100%;
+  background:#1a1a1a;
+  border:1.5px solid #2a2a2a;
+  border-radius:10px;
+  color:#f0f0f0;
+  padding:0.7rem 0.9rem;
+  font-size:0.9rem;
+  font-family:'Inter',sans-serif;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  outline:none;
+}
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus{
+  border-color:#008751;
+  box-shadow:0 0 0 3px rgba(0,135,81,0.12);
+}
+.form-textarea{
+  resize:vertical;
+  min-height:85px;
+  line-height:1.5;
+}
+.form-select option{background:#1a1a1a}
+
+/* ═══════════════════════════════════════════════
+   STAR SLIDER
+═══════════════════════════════════════════════ */
+.star-control{
+  background:#1a1a1a;
+  border:1.5px solid #2a2a2a;
+  border-radius:10px;
+  padding:0.9rem;
+}
+.star-display{
+  font-size:2rem;
+  text-align:center;
+  margin:0.5rem 0;
+  letter-spacing:2px;
+}
+.star-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:0.75rem;
+  color:#555;
+  margin-bottom:0.4rem;
+}
+input[type=range]{
+  width:100%;
+  accent-color:#f5a623;
+  cursor:pointer;
+  padding:0;
+  background:transparent;
+}
+
+/* ═══════════════════════════════════════════════
+   TOGGLE
+═══════════════════════════════════════════════ */
+.toggle-row{
+  display:flex;
+  align-items:center;
+  gap:0.8rem;
+  background:#1a1a1a;
+  border:1.5px solid #2a2a2a;
+  border-radius:10px;
+  padding:0.8rem 0.9rem;
+  cursor:pointer;
+}
+.toggle-row input[type=checkbox]{
+  width:16px;height:16px;
+  accent-color:#008751;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.toggle-row label{
+  font-size:0.88rem;
+  color:#d0d0d0;
+  cursor:pointer;
+  line-height:1.4;
+}
+
+/* ═══════════════════════════════════════════════
+   GENERATE BUTTON
+═══════════════════════════════════════════════ */
+.btn-generate{
+  width:100%;
+  background:linear-gradient(135deg,#008751,#00a862);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:1rem 1.5rem;
+  font-size:1.05rem;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:0.3px;
+  transition:transform 0.2s,box-shadow 0.2s,opacity 0.2s;
+  margin-top:0.5rem;
+}
+.btn-generate:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 10px 30px rgba(0,135,81,0.35);
+}
+.btn-generate:active:not(:disabled){transform:translateY(0)}
+.btn-generate:disabled{
+  opacity:0.55;cursor:not-allowed;
+}
+
+/* ═══════════════════════════════════════════════
+   LOADING
+═══════════════════════════════════════════════ */
+.loading{
+  display:none;
+  text-align:center;
+  padding:1rem;
+  color:#008751;
+  font-weight:600;
+  font-size:0.9rem;
+}
+.loading.show{display:block}
+.dot-pulse::after{
+  content:'...';
+  animation:dots 1.5s steps(4,end) infinite;
+}
+@keyframes dots{
+  0%,20%{content:'.'}
+  40%{content:'..'}
+  60%,100%{content:'...'}
+}
+
+/* ═══════════════════════════════════════════════
+   OUTPUT BOXES
+═══════════════════════════════════════════════ */
+.output-label{
+  font-size:0.72rem;
+  font-weight:700;
+  color:#555;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:0.4rem;
+}
+.output-box{
+  background:#1a1a1a;
+  border:1.5px solid #252525;
+  border-radius:10px;
+  padding:1rem;
+  font-size:0.9rem;
+  line-height:1.7;
+  color:#d0d0d0;
+  min-height:70px;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.output-box.review{
+  border-color:#008751;
+  border-width:2px;
+  font-size:0.95rem;
+  line-height:1.8;
+  min-height:140px;
+  color:#e8e8e8;
+}
+.output-box.placeholder{
+  color:#444;
+  font-style:italic;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+/* stars big */
+.stars-result{
+  font-size:2.2rem;
+  text-align:center;
+  padding:0.8rem;
+  letter-spacing:3px;
+}
+
+/* ═══════════════════════════════════════════════
+   METRICS GRID
+═══════════════════════════════════════════════ */
+.metrics-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0.8rem;
+  margin-top:0.5rem;
+}
+.metric-tile{
+  background:#1a1a1a;
+  border:1px solid #252525;
+  border-radius:10px;
+  padding:0.9rem 0.5rem;
+  text-align:center;
+}
+.metric-value{
+  font-size:1.5rem;
+  font-weight:800;
+  color:#f5a623;
+  line-height:1;
+}
+.metric-name{
+  font-size:0.68rem;
+  color:#555;
+  margin-top:0.3rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.4px;
+}
+
+/* ═══════════════════════════════════════════════
+   COPY BUTTON
+═══════════════════════════════════════════════ */
+.copy-wrap{position:relative}
+.copy-btn{
+  position:absolute;
+  top:0.5rem;right:0.5rem;
+  background:#222;
+  border:1px solid #333;
+  border-radius:6px;
+  color:#888;
+  padding:0.25rem 0.55rem;
+  font-size:0.72rem;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.copy-btn:hover{background:#333;color:#fff}
+
+/* ═══════════════════════════════════════════════
+   EXAMPLES
+═══════════════════════════════════════════════ */
+.examples-wrap{margin-top:2rem}
+.examples-title{
+  font-size:1rem;
+  font-weight:700;
+  color:#f5a623;
+  margin-bottom:1rem;
+  padding-left:0.2rem;
+}
+.examples-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1rem;
+}
+.example-card{
+  background:#141414;
+  border:1.5px solid #222;
+  border-radius:12px;
+  padding:1rem;
+  cursor:pointer;
+  transition:border-color 0.2s,transform 0.2s;
+}
+.example-card:hover{
+  border-color:#008751;
+  transform:translateY(-3px);
+}
+.example-card h4{
+  color:#f5a623;
+  font-size:0.85rem;
+  margin-bottom:0.4rem;
+}
+.example-card p{
+  color:#666;
+  font-size:0.78rem;
+  line-height:1.5;
+}
+
+/* ═══════════════════════════════════════════════
+   PERSONA BADGE
+═══════════════════════════════════════════════ */
+.persona-pill{
+  display:inline-block;
+  background:#1e1e1e;
+  border:1px solid #333;
+  border-radius:20px;
+  padding:0.2rem 0.7rem;
+  font-size:0.75rem;
+  color:#aaa;
+  margin-top:0.4rem;
+}
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+.footer{
+  text-align:center;
+  padding:2rem 1rem;
+  color:#333;
+  font-size:0.8rem;
+  border-top:1px solid #1a1a1a;
+  margin-top:3rem;
+  line-height:1.8;
+}
+.footer span{color:#008751}
+
+/* ═══════════════════════════════════════════════
+   SECTION DIVIDER
+═══════════════════════════════════════════════ */
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,#333,transparent);
+  margin:1rem 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════ -->
+<div class="header">
+  <div class="header-content">
+    <div class="flag-stripe">
+      <div class="stripe green"></div>
+      <div class="stripe white"></div>
+      <div class="stripe green"></div>
+    </div>
+    <h1>🇳🇬 Let Naija Speak</h1>
+    <div class="header-sub">
+      AI-Powered Nigerian Review Generator<br/>
+      <span style="font-size: 0.9rem; opacity: 0.9;">Built with ✨ by Eniitan Oluwatoyin Shadrack (AUTOMAX LABS)</span><br/>
+      <span style="font-size: 0.85rem; font-style: italic; opacity: 0.8; margin-top: 0.3rem;">Glory be to God for this project</span><br/>
+      Grounded in 80,000 real Yelp reviews · Four authentic Nigerian cultural voices
+    </div>
+    <div class="badges">
+      <span class="badge badge-gold">⚡ Groq LLaMA 3.3 70B</span>
+      <span class="badge badge-white">📊 ROUGE + RMSE Evaluation</span>
+      <span class="badge badge-white">🎭 Yoruba · Igbo · Pidgin · Professional</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<div class="container">
+<div class="main-grid">
+
+  <!-- ════════════ LEFT: INPUTS ════════════ -->
+  <div class="inputs-col">
+
+    <!-- USER PROFILE -->
+    <div class="card">
+      <div class="card-header">👤 User Profile</div>
+
+      <div class="form-row">
+        <label class="form-label">Select User</label>
+        <select class="form-select" id="user_id"
+                onchange="onUserChange()">
+          {% for uid, uname in users.items() %}
+          <option value="{{ uid }}">{{ uname }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- CUSTOM PERSONA -->
+<div class="form-row" id="custom-persona-row" style="display: none;">
+  <label class="form-label" for="persona_type">
+    Cultural Persona
+  </label>
+
+  <select class="form-select" id="persona_type" name="persona_type">
+    {% for ptype, plabel in personas.items() %}
+      <option value="{{ ptype }}">
+        {{ plabel }}
+      </option>
+    {% endfor %}
+  </select>
+</div>
+
+<!-- CUSTOM NAME -->
+<div class="form-row" id="custom-name-row" style="display: none;">
+  <label class="form-label" for="custom_name">
+    Your Name
+  </label>
+
+  <input
+    class="form-input"
+    type="text"
+    id="custom_name"
+    name="custom_name"
+    placeholder="e.g. Amaka, Dele, Kemi..."
+    autocomplete="off"
+  />
+</div>
+
+<!-- USER PROFILE DISPLAY -->
+<div id="user-profile-pill" style="margin-top: 0.4rem;"></div>
+
+</div>
+
+<!-- PRODUCT DETAILS -->
+<div class="card">
+
+  <div class="card-header">
+    🛍️ Product / Service Details
+  </div>
+
+  <!-- PRODUCT NAME -->
+  <div class="form-row">
+    <label class="form-label" for="product_name">
+      Product Name *
+    </label>
+
+    <input
+      class="form-input"
+      type="text"
+      id="product_name"
+      name="product_name"
+      placeholder="e.g. Chicken Republic Grilled Chicken"
+      autocomplete="off"
+      required
+    />
+  </div>
+
+  <!-- PRODUCT CATEGORY -->
+  <div class="form-row">
+    <label class="form-label" for="product_category">
+      Category
+    </label>
+
+    <select
+      class="form-select"
+      id="product_category"
+      name="product_category"
+    >
+      {% for cat in categories %}
+        <option value="{{ cat }}">
+          {{ cat }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+      <div class="form-row">
+        <label class="form-label">Product Description *</label>
+        <textarea class="form-textarea" id="product_details"
+          placeholder="Describe quality, features, service experience, location, what was good or bad..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Price</label>
+        <input class="form-input" type="text"
+               id="price"
+               placeholder="e.g. ₦3,500 or $10 or Free"/>
+      </div>
+    </div>
+
+    <!-- CONTEXTUAL SIGNALS -->
+    <div class="card">
+      <div class="card-header">🎯 Contextual Signals</div>
+      <div class="form-row">
+        <label class="form-label">Purchase Occasion</label>
+        <select class="form-select" id="occasion">
+          {% for occ in occasions %}
+          <option value="{{ occ }}">{{ occ }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">User Mood at Review Time</label>
+        <select class="form-select" id="mood">
+          {% for m in moods %}
+          <option value="{{ m }}">{{ m }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <!-- RATING SETTINGS -->
+    <div class="card">
+      <div class="card-header">⭐ Rating Settings</div>
+
+      <div class="form-row">
+        <div class="toggle-row">
+          <input type="checkbox" id="use_prediction"
+                 checked onchange="onPredictToggle()"/>
+          <label for="use_prediction">
+            🤖 Auto-Predict Rating — AI decides based on
+            user profile + product context
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row" id="manual-star-row">
+        <div class="star-control">
+          <div class="star-label">
+            <span>Manual Rating</span>
+            <span id="star-num-label">3 / 5</span>
+          </div>
+          <input type="range" id="manual_stars"
+                 min="1" max="5" value="3"
+                 oninput="updateStarDisplay(this.value)"/>
+          <div class="star-display" id="star-emoji">⭐⭐⭐</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-generate" id="gen-btn"
+            onclick="generate()">
+      🚀 Generate Nigerian Review
+    </button>
+    <div class="loading" id="loading">
+      <span class="dot-pulse">
+        ⏳ Agent thinking, generating authentic Nigerian review
+      </span>
+    </div>
+
+  </div><!-- end inputs-col -->
+
+  <!-- ════════════ RIGHT: OUTPUTS ═════════ -->
+  <div class="outputs-col">
+
+    <!-- GENERATED REVIEW -->
+    <div class="card">
+      <div class="card-header">🗣️ Generated Review</div>
+      <div class="output-label">Authentic Nigerian Review</div>
+      <div class="copy-wrap">
+        <div class="output-box review placeholder"
+             id="review-out">
+          Your authentic Nigerian review will appear here...
+        </div>
+        <button class="copy-btn"
+                onclick="copyText('review-out')">
+          Copy
+        </button>
+      </div>
+      <div class="stars-result" id="stars-result">─</div>
+    </div>
+
+    <!-- ACTIVE USER -->
+    <div class="card">
+      <div class="card-header">👤 Active User Summary</div>
+      <div class="output-box placeholder" id="user-out">
+        Select a user to see their profile...
+      </div>
+    </div>
+
+    <!-- PREDICTION -->
+    <div class="card">
+      <div class="card-header">🤖 AI Rating Prediction</div>
+      <div class="output-label">
+        Agent reasoning before generating
+      </div>
+      <div class="output-box placeholder" id="prediction-out">
+        Prediction and reasoning will appear here...
+      </div>
+    </div>
+
+    <!-- EVALUATION METRICS -->
+    <div class="card">
+      <div class="card-header">📊 Evaluation Metrics</div>
+      <p style="color:#555;font-size:0.78rem;margin-bottom:0.8rem">
+        Grounded in Yelp dataset behavioral patterns (80k reviews)
+      </p>
+      <div class="metrics-grid">
+        <div class="metric-tile">
+          <div class="metric-value" id="m-rmse">—</div>
+          <div class="metric-name">Session RMSE</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-value" id="m-fidelity">—</div>
+          <div class="metric-name">Behavioural Fidelity</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-value" id="m-words">—</div>
+          <div class="metric-name">Word Count</div>
+        </div>
+      </div>
+      <div class="output-box" id="metrics-detail"
+           style="margin-top:0.8rem;font-size:0.82rem">
+        Metrics will update after each generation...
+      </div>
+    </div>
+
+  </div><!-- end outputs-col -->
+
+</div><!-- end main-grid -->
+
+<!-- ══════════════════════════════════════
+     EXAMPLES SECTION
+══════════════════════════════════════ -->
+<div class="examples-wrap">
+  <div class="examples-title">
+    💡 Click an Example to Load it Instantly
+  </div>
+  <div class="examples-grid">
+    <div class="example-card" onclick="loadExample(0)">
+      <h4>🔵 Igbo Engineer — Food Review</h4>
+      <p>Chukwuemeka (Software Engineer, Lagos) reviews
+         Chicken Republic. Authentic Igbo voice on jollof
+         rice experience.</p>
+    </div>
+    <div class="example-card" onclick="loadExample(1)">
+      <h4>🟡 Yoruba Designer — Fashion</h4>
+      <p>Folake (Fashion Designer, Ibadan) reviews Zara
+         Online. Expressive Lagos Yoruba on delivery and
+         quality.</p>
+    </div>
+    <div class="example-card" onclick="loadExample(2)">
+      <h4>🟢 Pidgin Worker — Telecom</h4>
+      <p>Emeka (Oil Worker, PH) roasts MTN data bundle.
+         Classic Naija disappointment review in raw
+         pidgin.</p>
+    </div>
+    <div class="example-card" onclick="loadExample(3)">
+      <h4>⚫ Professional — Hotel</h4>
+      <p>Dr. Adaeze (Doctor, Abuja) reviews Transcorp
+         Hilton. Formal Nigerian professional voice with
+         subtle flavour.</p>
+    </div>
+    <div class="example-card" onclick="loadExample(4)">
+      <h4>🟡 Student — Gaming App</h4>
+      <p>Tunde (Student, Lagos) reviews PUBG Mobile.
+         Young broke Yoruba student voice — pure
+         excitement.</p>
+    </div>
+    <div class="example-card" onclick="loadExample(5)">
+      <h4>🔵 Nurse — Health Product</h4>
+      <p>Ngozi (Nurse, Enugu) reviews Jumia Health
+         supplements. Careful Igbo professional voice
+         with honesty.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <strong style="color:#f5a623">
+    DSN × BCT Hackathon 3.0
+  </strong> · Task A: User Modeling Agent<br/>
+  <span>Dataset:</span> Yelp Review Full (80,000 reviews) ·
+  <span>Model:</span> Groq LLaMA 3.3 70B ·
+  <span>Metrics:</span> ROUGE · RMSE · Behavioural Fidelity<br/>
+  <span>Personas:</span> Yoruba · Igbo · Naija Pidgin ·
+  Educated Nigerian Professional
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+// ── EXAMPLE DATA ─────────────────────────────────────
+const EXAMPLES = [
+  {
+    user_id:"user_001",
+    product_name:"Chicken Republic Grilled Chicken",
+    product_category:"Restaurant / Food",
+    product_details:"Grilled chicken with jollof rice, served hot and fresh. Good portion size. Located at Victoria Island Lagos.",
+    price:"₦3,500",
+    occasion:"Regular day purchase",
+    mood:"Happy / Excited",
+    stars:4
+  },
+  {
+    user_id:"user_002",
+    product_name:"Zara Online Fashion Store",
+    product_category:"Fashion / Clothing",
+    product_details:"Women summer dress, good fabric quality, packaging was nice but delivery took 5 days.",
+    price:"₦25,000",
+    occasion:"Special occasion / celebration",
+    mood:"Impressed",
+    stars:4
+  },
+  {
+    user_id:"user_003",
+    product_name:"MTN 10GB Data Bundle",
+    product_category:"Banking / Fintech",
+    product_details:"10GB data valid for 30 days. Data finished in under 2 weeks. Network coverage poor on Lagos mainland.",
+    price:"₦3,000",
+    occasion:"Regular day purchase",
+    mood:"Disappointed",
+    stars:2
+  },
+  {
+    user_id:"user_004",
+    product_name:"Transcorp Hilton Abuja",
+    product_category:"Hotel / Accommodation",
+    product_details:"5-star hotel. Breakfast included. Excellent business center. Very clean rooms. Professional staff.",
+    price:"₦85,000/night",
+    occasion:"Work / business related",
+    mood:"Impressed",
+    stars:5
+  },
+  {
+    user_id:"user_005",
+    product_name:"PUBG Mobile Season Pass",
+    product_category:"Gaming",
+    product_details:"New season with amazing skins, smooth gameplay on Android, great new maps and missions.",
+    price:"₦2,500",
+    occasion:"Regular day purchase",
+    mood:"Happy / Excited",
+    stars:5
+  },
+  {
+    user_id:"user_006",
+    product_name:"Jumia Health Vitamin C Tablets",
+    product_category:"Health / Pharmacy",
+    product_details:"500mg Vitamin C tablets, authentic product, sealed packaging, fast delivery to Enugu.",
+    price:"₦4,500",
+    occasion:"Regular day purchase",
+    mood:"Neutral / Normal",
+    stars:4
+  }
+];
+
+// ── LOAD EXAMPLE ──────────────────────────────────────
+function loadExample(idx){
+  const ex = EXAMPLES[idx];
+  document.getElementById('user_id').value = ex.user_id;
+  document.getElementById('product_name').value = ex.product_name;
+  document.getElementById('product_category').value = ex.product_category;
+  document.getElementById('product_details').value = ex.product_details;
+  document.getElementById('price').value = ex.price;
+  document.getElementById('occasion').value = ex.occasion;
+  document.getElementById('mood').value = ex.mood;
+  document.getElementById('manual_stars').value = ex.stars;
+  updateStarDisplay(ex.stars);
+  onUserChange();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── STAR DISPLAY ──────────────────────────────────────
+function updateStarDisplay(val){
+  val = parseInt(val);
+  document.getElementById('star-num-label').textContent =
+    val + ' / 5';
+  document.getElementById('star-emoji').textContent =
+    '⭐'.repeat(val);
+}
+
+// ── USER CHANGE ───────────────────────────────────────
+function onUserChange(){
+  const uid = document.getElementById('user_id').value;
+  const isCustom = uid === 'custom';
+  document.getElementById('custom-persona-row').style.display =
+    isCustom ? 'block' : 'none';
+  document.getElementById('custom-name-row').style.display =
+    isCustom ? 'block' : 'none';
+}
+
+// ── PREDICT TOGGLE ────────────────────────────────────
+function onPredictToggle(){
+  const checked =
+    document.getElementById('use_prediction').checked;
+  document.getElementById('manual-star-row').style.display =
+    checked ? 'none' : 'block';
+}
+// Init toggle state
+onPredictToggle();
+
+// ── COPY TEXT ─────────────────────────────────────────
+function copyText(id){
+  const el = document.getElementById(id);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = el.parentElement.querySelector('.copy-btn');
+    if(btn){ btn.textContent='✅ Copied!'; }
+    setTimeout(()=>{
+      if(btn){ btn.textContent='Copy'; }
+    }, 2000);
+  });
+}
+
+// ── MAIN GENERATE ─────────────────────────────────────
+async function generate(){
+  const productName =
+    document.getElementById('product_name').value.trim();
+  if(!productName){
+    alert('Please enter a product name!');
+    return;
+  }
+  const productDetails =
+    document.getElementById('product_details').value.trim();
+  if(!productDetails){
+    alert('Please describe the product!');
+    return;
+  }
+
+  // UI state: loading
+  const btn = document.getElementById('gen-btn');
+  const loading = document.getElementById('loading');
+  btn.disabled = true;
+  loading.classList.add('show');
+
+  // Clear placeholders
+  setPlaceholder('review-out', '⏳ Generating...');
+  setPlaceholder('prediction-out', '⏳ Predicting...');
+  document.getElementById('stars-result').textContent = '⏳';
+  document.getElementById('user-out').textContent = '...';
+
+  const payload = {
+    user_id: document.getElementById('user_id').value,
+    persona_type:
+      document.getElementById('persona_type')?.value || 'pidgin',
+    product_name: productName,
+    product_category:
+      document.getElementById('product_category').value,
+    product_details: productDetails,
+    price: document.getElementById('price').value,
+    manual_stars:
+      parseInt(document.getElementById('manual_stars').value),
+    use_prediction:
+      document.getElementById('use_prediction').checked,
+    occasion: document.getElementById('occasion').value,
+    mood: document.getElementById('mood').value
+  };
+
+  try{
+    const res = await fetch('/generate', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+      // ── Review output
+      const reviewEl = document.getElementById('review-out');
+      reviewEl.textContent = data.review;
+      reviewEl.classList.remove('placeholder');
+
+      // ── Stars
+      const stars = '⭐'.repeat(data.final_stars);
+      document.getElementById('stars-result').textContent =
+        stars + '  (' + data.final_stars + '/5 stars)';
+
+      // ── User summary
+      const userEl = document.getElementById('user-out');
+      userEl.textContent =
+        '👤 ' + data.user_name + '\n' +
+        '📍 ' + data.user_city +
+        ' — ' + data.user_occupation + '\n' +
+        '🎭 ' + data.persona_label + '\n' +
+        '💬 Style: ' + data.persona_style + '\n' +
+        '📈 Rating Tendency: ' + data.rating_tendency;
+      userEl.classList.remove('placeholder');
+
+      // ── Prediction
+      const factors = data.key_factors
+        .map(f => '  • ' + f).join('\n');
+      const predEl = document.getElementById('prediction-out');
+      predEl.textContent =
+        '🤖 Predicted Rating: ' +
+        data.predicted_stars + '/5 stars\n' +
+        '📊 Confidence: ' +
+        data.confidence.toUpperCase() + '\n' +
+        '🔍 Key Factors:\n' + factors + '\n' +
+        '💭 Reasoning: ' + data.reasoning;
+      predEl.classList.remove('placeholder');
+
+      // ── Metrics tiles
+      document.getElementById('m-rmse').textContent =
+        data.session_rmse !== null
+          ? data.session_rmse
+          : 'N/A';
+      document.getElementById('m-fidelity').textContent =
+        data.behavioral_fidelity.toFixed(2);
+      document.getElementById('m-words').textContent =
+        data.word_count;
+
+      // ── Metrics detail
+      document.getElementById('metrics-detail').textContent =
+        '📊 EVALUATION DETAILS\n' +
+        '─────────────────────────────\n' +
+        'Predicted Stars:    ' + data.predicted_stars + '/5\n' +
+        'Final Stars Used:   ' + data.final_stars + '/5\n' +
+        'Behavioural Fidelity: ' + data.behavioral_fidelity + '\n' +
+        'Word Count:         ' + data.word_count + '\n' +
+        'Expected Words:     ' + data.expected_words + '\n' +
+        'Session RMSE:       ' +
+        (data.session_rmse || 'Need 2+ reviews') + '\n' +
+        'Reviews This Session: ' + data.session_count + '\n' +
+        '─────────────────────────────\n' +
+        'Note: ROUGE scores computed\n' +
+        'in Colab analytics notebook.\n' +
+        'Full results: task_a_results.json';
+
+    } else {
+      setPlaceholder('review-out',
+        '❌ Error: ' + data.error);
+    }
+
+  } catch(err){
+    setPlaceholder('review-out',
+      '❌ Connection error. Is the server running?\n' +
+      err.message);
+  }
+
+  btn.disabled = false;
+  loading.classList.remove('show');
+}
+
+function setPlaceholder(id, text){
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.classList.add('placeholder');
+}
+
+// Init on load
+onUserChange();
+</script>
+</body>
+</html>
