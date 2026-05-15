@@ -201,6 +201,24 @@ python app.py
 gunicorn --bind 0.0.0.0:7860 app:app
 ```
 
+### Render deployment
+Render can deploy this service directly using the `PORT` environment variable.
+
+1. Create a new Web Service in Render and point it to this repository.
+2. Set the Root Directory to `task_a`.
+3. Use `Python` as the environment.
+4. Use this build command:
+   ```bash
+   pip install -r requirements.txt
+   ```
+5. Use this start command:
+   ```bash
+   gunicorn --bind 0.0.0.0:$PORT app:app
+   ```
+6. Set `FLASK_DEBUG=False` in Render environment variables.
+
+> This project also includes `render.yaml` for Render auto deploy configuration.
+
 ### Docker (optional)
 ```dockerfile
 FROM python:3.11
