@@ -5,6 +5,7 @@
 # ===========================================================
 from flask import Flask, render_template, request, jsonify
 from agent import run_pipeline
+from config import FLASK_HOST, FLASK_PORT, FLASK_DEBUG
 from personas import (
     NIGERIAN_USERS,
     CATEGORIES,
@@ -142,4 +143,4 @@ def health():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=7860, host='0.0.0.0')
+    app.run(debug=FLASK_DEBUG, port=FLASK_PORT, host=FLASK_HOST)
